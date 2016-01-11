@@ -14,6 +14,10 @@ def detect(img, cascade):
 def draw_rects(img, rects, color):
 	for x1, y1, x2, y2 in rects:
 		cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
+		
+def draw_single_rect(img,x1,y1,x2,y2,color):
+	cv2.rectangle(img, (x1,y1), (x2,y2), color, 2)
+
 
 if __name__ == '__main__':
 	start_time = time.time()
@@ -76,23 +80,31 @@ if __name__ == '__main__':
 
 			## Detect mouth on the face
 			gray_mouth = cv2.equalizeHist(faceROI)
-			rects_mouth_tmp = detect(gray_mouth, cascade_mouth)
-			numrow_mouth = len(rects_mouth_tmp)
+			rects_mouth = detect(gray_mouth, cascade_mouth)
+			numrow_mouth = len(rects_mouth)
 
 			#Keep only the rectangle at the bottom of the face
-			rects_mouth = sorted(rects_mouth_tmp, key=lambda x:x[3])
+			#rects_mouth = sorted(rects_mouth_tmp, key=lambda x:x[3])
 			#rects_mouth = (rects_mouth_tmp[numrow_mouth-1])
 			#numrow_mouth = len(rects_mouth)
 			#print numrow_mouth
 
 			## Coordinates base change	
-			rects_mouth[numrow_mouth-1][1] = rects_mouth[numrow_mouth-1][1] + x1
-			rects_mouth[numrow_mouth-1][0] = rects_mouth[numrow_mouth-1][0] + y1
-			rects_mouth[numrow_mouth-1][3] = rects_mouth[numrow_mouth-1][3] + x1
-			rects_mouth[numrow_mouth-1][2] = rects_mouth[numrow_mouth-1][2] + y1
+			#rects_mouth[numrow_mouth-1][1] = rects_mouth[numrow_mouth-1][1] + x1
+			#rects_mouth[numrow_mouth-1][0] = rects_mouth[numrow_mouth-1][0] + y1
+			#rects_mouth[numrow_mouth-1][3] = rects_mouth[numrow_mouth-1][3] + x1
+			#rects_mouth[numrow_mouth-1][2] = rects_mouth[numrow_mouth-1][2] + y1
 			
-			#for i in range(0, numrow_mouth-1):
-			#	del(rects_mouth[0])			
+			for i in range(0,numrow_mouth):
+				rects_mouth[i][1] = rects_mouth[i][1] + x1
+				rects_mouth[i][0] = rects_mouth[i][0] + y1
+				rects_mouth[i][3] = rects_mouth[i][3] + x1
+				rects_mouth[i][2] = rects_mouth[i][2] + y1
+
+			rects_mouth = sorted(rects_mouth, key=lambda x:x[3])
+			rects_mouth = (rects_mouth[numrow_mouth-1])
+			print rects_mouth
+			#rects_mouth = rects_mouth[[numrow_mouth-1]]		
 	
 			## Show face ROI
 			cv2.imshow('Display face ROI', faceROI)
@@ -100,8 +112,8 @@ if __name__ == '__main__':
 			vis = img.copy()
 			draw_rects(vis, rects, (0, 255, 0))
 			draw_rects(vis, rects_eyes, (255, 0, 0))
-			draw_rects(vis, rects_mouth, (0,0,255))
-
+			draw_single_rect(vis, rects_mouth[0],rects_mouth[1],rects_mouth[2],rects_mouth[3], (0,0,255))
+			#draw_rects(vis, rects_mouth, (0,0,255))
         		cv2.namedWindow('Display image')          ## create window for display
         		cv2.imshow('Display image', vis)          ## Show image in the window
 
