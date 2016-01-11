@@ -22,6 +22,13 @@ if __name__ == '__main__':
 
 	else:
 		img = cv2.imread(sys.argv[1],cv2.CV_LOAD_IMAGE_COLOR)  ## Read image file
+		img = cv2.resize(img,(0,0), fx=0.05,fy=0.05)
+		
+		rows,cols,z = img.shape
+		
+		M = cv2.getRotationMatrix2D((cols/2,rows/2),-90,1)
+		img = cv2.warpAffine(img,M,(cols,rows))
+		cv2.imwrite("test.jpg",img);
 
 		if (img == None):                                      ## Check for invalid input
 			print "Could not open or find the image"
@@ -30,11 +37,12 @@ if __name__ == '__main__':
 			cascade_eye = cv2.CascadeClassifier("haarcascade_eye.xml")
 			cascade_mouth = cv2.CascadeClassifier("haarcascade_mcs_mouth.xml")
 			gray = cv2.cvtColor(img, cv.CV_BGR2GRAY)
-			gray_face = cv2.equalizeHist(gray)
+			#gray_face = cv2.equalizeHist(gray)
 	
 			kernel = np.ones((5,5),np.float32)/25
-			gray_face = cv2.filter2D(gray_face,-1,kernel)
-			cv2.imshow('Display face ROI', gray_face)
+			#gray_face = cv2.filter2D(gray_face,-1,kernel)
+			gray = cv2.filter2D(gray,-1,kernel)
+			cv2.imshow('Display face ROI', gray)
 
 			rects = detect(gray, cascade_face)
 			
@@ -51,13 +59,13 @@ if __name__ == '__main__':
 
 			## Detect eyes on the face
 			gray_eyes = cv2.equalizeHist(faceROI)
-			rects_eyes_tmp = detect(gray_eyes, cascade_eye)
-			numrow_eyes = len(rects_eyes_tmp)
+			rects_eyes = detect(gray_eyes, cascade_eye)
+			numrow_eyes = len(rects_eyes)
 
 			# Keep only the two rectangles at the top of the face
-			rects_eyes_tmp = sorted(rects_eyes_tmp,key=lambda x: x[1])
-			rects_eyes = (rects_eyes_tmp[0],rects_eyes_tmp[1])
-			numrow_eyes = len(rects_eyes)
+			#rects_eyes_tmp = sorted(rects_eyes_tmp,key=lambda x: x[1])
+			#rects_eyes = (rects_eyes_tmp[0],rects_eyes_tmp[1])
+			#numrow_eyes = len(rects_eyes)
 
 			## Coordinates base change
 			for i in range(0,numrow_eyes):		
@@ -83,8 +91,8 @@ if __name__ == '__main__':
 			rects_mouth[numrow_mouth-1][3] = rects_mouth[numrow_mouth-1][3] + x1
 			rects_mouth[numrow_mouth-1][2] = rects_mouth[numrow_mouth-1][2] + y1
 			
-			for i in range(0, numrow_mouth-1):
-				del(rects_mouth[0])			
+			#for i in range(0, numrow_mouth-1):
+			#	del(rects_mouth[0])			
 	
 			## Show face ROI
 			cv2.imshow('Display face ROI', faceROI)
