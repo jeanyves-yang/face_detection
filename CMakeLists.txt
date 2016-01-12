@@ -4,6 +4,8 @@ set(PROJECT_NAME face_detection)
 
 project(${PROJECT_NAME})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_SOURCE_DIR})
 
 find_package(OpenCV REQUIRED)
 
@@ -14,5 +16,6 @@ add_executable(
   ${PROJECT_NAME}
   face_detection.cpp
 )
+
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${OpenCV_LIBS})
