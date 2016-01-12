@@ -3,6 +3,8 @@ import cv2.cv as cv
 import sys
 import time
 import numpy as np
+import os
+from os.path import basename
 
 def detect(img, cascade):
 	rects = cascade.detectMultiScale(img, scaleFactor=1.1, minNeighbors=3, minSize=(10, 10), flags = cv.CV_HAAR_SCALE_IMAGE)
@@ -30,9 +32,11 @@ if __name__ == '__main__':
 		
 		rows,cols,z = img.shape
 		
-		M = cv2.getRotationMatrix2D((cols/2,rows/2),-90,1)
-		img = cv2.warpAffine(img,M,(cols,rows))
-		cv2.imwrite("test.jpg",img);
+		#M = cv2.getRotationMatrix2D((cols/2,rows/2),-90,1)
+		#img = cv2.warpAffine(img,M,(cols,rows))
+		#cv2.imwrite("test.jpg",img);
+		img = cv2.transpose(img)
+		img = cv2.flip(img, cols/2)
 
 		if (img == None):                                      ## Check for invalid input
 			print "Could not open or find the image"
@@ -46,11 +50,11 @@ if __name__ == '__main__':
 			kernel = np.ones((5,5),np.float32)/25
 			#gray_face = cv2.filter2D(gray_face,-1,kernel)
 			gray = cv2.filter2D(gray,-1,kernel)
-			cv2.imshow('Display face ROI', gray)
+			#cv2.imshow('Display face ROI', gray)
 
 			rects = detect(gray, cascade_face)
 			
-			print len(rects)
+			#print len(rects)
 			
 			## Extract face coordinates			
 			x1 = rects[0][1]
@@ -63,13 +67,13 @@ if __name__ == '__main__':
 
 			## Detect eyes on the face
 			gray_eyes = cv2.equalizeHist(faceROI)
-			rects_eyes = detect(gray_eyes, cascade_eye)
-			numrow_eyes = len(rects_eyes)
+			rects_eyes_tmp = detect(gray_eyes, cascade_eye)
+			numrow_eyes = len(rects_eyes_tmp)
 
 			# Keep only the two rectangles at the top of the face
-			#rects_eyes_tmp = sorted(rects_eyes_tmp,key=lambda x: x[1])
-			#rects_eyes = (rects_eyes_tmp[0],rects_eyes_tmp[1])
-			#numrow_eyes = len(rects_eyes)
+			rects_eyes_tmp = sorted(rects_eyes_tmp,key=lambda x: x[1])
+			rects_eyes = (rects_eyes_tmp[0],rects_eyes_tmp[1])
+			numrow_eyes = len(rects_eyes)
 
 			## Coordinates base change
 			for i in range(0,numrow_eyes):		
@@ -83,18 +87,7 @@ if __name__ == '__main__':
 			rects_mouth = detect(gray_mouth, cascade_mouth)
 			numrow_mouth = len(rects_mouth)
 
-			#Keep only the rectangle at the bottom of the face
-			#rects_mouth = sorted(rects_mouth_tmp, key=lambda x:x[3])
-			#rects_mouth = (rects_mouth_tmp[numrow_mouth-1])
-			#numrow_mouth = len(rects_mouth)
-			#print numrow_mouth
-
 			## Coordinates base change	
-			#rects_mouth[numrow_mouth-1][1] = rects_mouth[numrow_mouth-1][1] + x1
-			#rects_mouth[numrow_mouth-1][0] = rects_mouth[numrow_mouth-1][0] + y1
-			#rects_mouth[numrow_mouth-1][3] = rects_mouth[numrow_mouth-1][3] + x1
-			#rects_mouth[numrow_mouth-1][2] = rects_mouth[numrow_mouth-1][2] + y1
-			
 			for i in range(0,numrow_mouth):
 				rects_mouth[i][1] = rects_mouth[i][1] + x1
 				rects_mouth[i][0] = rects_mouth[i][0] + y1
@@ -103,8 +96,6 @@ if __name__ == '__main__':
 
 			rects_mouth = sorted(rects_mouth, key=lambda x:x[3])
 			rects_mouth = (rects_mouth[numrow_mouth-1])
-			print rects_mouth
-			#rects_mouth = rects_mouth[[numrow_mouth-1]]		
 	
 			## Show face ROI
 			cv2.imshow('Display face ROI', faceROI)
@@ -116,7 +107,7 @@ if __name__ == '__main__':
 			#draw_rects(vis, rects_mouth, (0,0,255))
         		cv2.namedWindow('Display image')          ## create window for display
         		cv2.imshow('Display image', vis)          ## Show image in the window
-
+			#cv2.imwrite("/tmp/output_NT/FrontFace/" + os.path.basename(sys.argv[1]),vis) 
         		print "size of image: ", img.shape        ## print size of image
 			print("--- %s seconds ---" % (time.time() - start_time))
 
