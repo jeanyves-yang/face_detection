@@ -48,19 +48,24 @@ int main(int argc, char** argv )
     kernel = Mat::ones( kernelSize, kernelSize, CV_32F )/ (float)(kernelSize * kernelSize);
     filter2D(gray, gray, -1 , kernel, Point( 0, 0 ), 0, BORDER_DEFAULT );
 
+    // Detect Face
     std::vector<Rect> rectFace;
-    faceCascade.detectMultiScale( gray, rectFace,1.1, 3,0|CV_HAAR_SCALE_IMAGE,Size(10,10));
+    faceCascade.detectMultiScale(gray, rectFace,1.1, 3,0|CV_HAAR_SCALE_IMAGE,Size(10,10));
 
     Mat faceROI = gray( rectFace[0] );
+
+    // Detect Eyes
     std::vector<Rect> rectEyes;
 
-    eyeCascade.detectMultiScale( faceROI, rectEyes,1.1, 3,0|CV_HAAR_SCALE_IMAGE,Size(10,10));
+    eyeCascade.detectMultiScale(faceROI, rectEyes,1.1, 3,0|CV_HAAR_SCALE_IMAGE,Size(10,10));
+
+    // Detect Mouth
+    std::vector<Rect> rectMouth;
+    mouthCascade.detectMultiScale(faceROI, rectMouth,1.1, 3,0|CV_HAAR_SCALE_IMAGE,Size(10,10));
 
     Mat vis;
     image.copyTo(vis);
     rectangle(vis, rectFace[0], Scalar(255,0,0),2);
-
-
 
     for( size_t j = 0; j < rectEyes.size(); j++ )
     {
@@ -68,6 +73,11 @@ int main(int argc, char** argv )
         Point BR = rectEyes[j].br() + rectFace[0].tl() ;
         rectangle(vis, TL, BR, Scalar(0,255,0), 2);
     }
+
+    Point TL = rectMouth[0].tl() + rectFace[0].tl();
+    Point BR = rectMouth[0].br() + rectFace[0].tl();
+
+    rectangle(vis, TL, BR, Scalar(0,0,255),2);
 
     namedWindow("Display Image", WINDOW_NORMAL);
     imshow("Display Image", vis);
