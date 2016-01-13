@@ -15,6 +15,8 @@ ADD_DEFINITIONS(-Wall -Wextra -std=c++11 -Wno-comment -Wno-unused-parameter -Wno
 add_executable(
   ${PROJECT_NAME}
   face_detection.cpp
+  eyelash_detection.cpp
+  header.hpp
 )
 
 
