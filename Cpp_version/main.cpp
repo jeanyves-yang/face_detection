@@ -1,4 +1,9 @@
 #include "header.hpp"
+#include <iostream>
+#include <iomanip>
+#include <boost/filesystem.hpp>
+#include <boost/version.hpp>
+#include <ctime>
 
 using namespace cv;
 
@@ -10,6 +15,9 @@ int main(int argc, char** argv )
         return -1;
     }
 
+    std::clock_t start;
+    start=std::clock();
+
     Mat image;
     image = imread( argv[1], 1 );
 
@@ -18,7 +26,6 @@ int main(int argc, char** argv )
         printf("No image data \n");
         return -1;
     }
-
 
     cv::Rect rectFace;
     cv::vector<cv::Rect> rectEyes;
@@ -45,12 +52,15 @@ int main(int argc, char** argv )
     cv::vector<cv::Point> lips;
     lips_detection(image,rectMouth,rectFace,vis,lips);
 
-    cv::namedWindow("Display Image", cv::WINDOW_NORMAL);
-    cv::imshow("Display Image", vis);
-    cv::imwrite("Detection_resultat.jpg",vis);
+    //cv::namedWindow("Display Image", cv::WINDOW_NORMAL);
+    //cv::imshow("Display Image", vis);
+    boost::filesystem::path outputPath(argv[1]);
+    //outputPath.filename().stem().c_str();
+    std::string path = "/tmp/NT_0_05/";
+    cv::imwrite(path + outputPath.filename().stem().string() + outputPath.filename().extension().string(),vis);
 
 //    tracking(argv[1],eyeLashs);
-
-    waitKey(0);
+    std::cout << "Time: "<<(std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) << "ms"<<std::endl;
+    //waitKey(0);
     return 0;
 }

@@ -8,6 +8,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_SOURCE_DIR})
 
 find_package(OpenCV REQUIRED)
+set(Boost_USE_STATIC_LIBS        OFF)
+set(Boost_USE_MULTITHREADED      ON)
+set(Boost_USE_STATIC_RUNTIME    OFF)
+find_package(Boost COMPONENTS filesystem system REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
+link_directories(${Boost_LIBRARY_DIR})
 
 SET(CMAKE_BUILD_TYPE Debug)
 ADD_DEFINITIONS(-Wall -Wextra -std=c++11 -Wno-comment -Wno-unused-parameter -Wno-unused-function -Wno-unused-variable)
@@ -23,4 +29,4 @@ add_executable(
 )
 
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${OpenCV_LIBS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${OpenCV_LIBS} ${Boost_LIBRARIES})

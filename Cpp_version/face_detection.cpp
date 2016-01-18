@@ -33,9 +33,11 @@ void face_detection(cv::Mat &image,cv::Rect &rectFace, cv::vector<cv::Rect> &rec
     cv::filter2D(gray, gray, -1 , kernel, cv::Point( 0, 0 ), 0, cv::BORDER_DEFAULT );
 
     //detect face
+    cv::Mat srcLowScale = gray.clone();
+    cv::resize(srcLowScale, srcLowScale, cv::Size(), 0.5, 0.5, cv::INTER_LINEAR);
     cv::vector<cv::Rect> rectFaces;
-    faceCascade.detectMultiScale( gray, rectFaces,1.1, 3,0|CV_HAAR_SCALE_IMAGE,cv::Size(10,10));
-    rectFace = rectFaces[0];
+    faceCascade.detectMultiScale( srcLowScale, rectFaces,1.1, 3,0|CV_HAAR_SCALE_IMAGE,cv::Size(10,10));
+    rectFace = cv::Rect(rectFaces[0].tl()*2, rectFaces[0].br()*2);
     cv::rectangle(vis, rectFace, cv::Scalar(255,0,0),2);
 
     cv::Mat faceROILowScale = gray(rectFace);
@@ -55,7 +57,7 @@ void face_detection(cv::Mat &image,cv::Rect &rectFace, cv::vector<cv::Rect> &rec
     // Detect Mouth
     std::vector<cv::Rect> rectMouths;
     mouthCascade.detectMultiScale(faceROILowScale, rectMouths,1.1, 3,0|CV_HAAR_SCALE_IMAGE,cv::Size(10,10));
-    //Take the mouth the most on the bottom
+    //Take the mouth the most at the bottom
     int indGoodMouth=0;
     int posGoodMouth=0;
     for( size_t j = 0; j < rectMouths.size(); j++ )

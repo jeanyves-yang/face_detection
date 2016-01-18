@@ -4,7 +4,7 @@
 void eyelash_detection(cv::Mat src, cv::Rect rectEye, cv::Mat &vis, cv::vector<cv::Point> &eyeLash)
 {
 
-    cv::Point BR=rectEye.br();
+    //cv::Point BR=rectEye.br();
     cv::Point TL=rectEye.tl();
     cv::Mat eyeROI = src( rectEye );
     cv::Mat hsvEyeROI;
@@ -22,13 +22,13 @@ void eyelash_detection(cv::Mat src, cv::Rect rectEye, cv::Mat &vis, cv::vector<c
 
     cv::vector<cv::vector<cv::Point>> contours;
     cv::findContours(sob,contours,CV_RETR_EXTERNAL,CV_CHAIN_APPROX_NONE);
-    int bigContour1=0;
+    unsigned int bigContour1=0;
     int indbigContour1=0;
     int bigContour2=0;
     int indbigContour2=0;
 
-    //get the biggest contour, hopefuly the eye
-    for(int i=0;i<contours.size();i++)
+    //get the biggest contour, hopefully the eye
+    for(unsigned int i=0;i<contours.size();i++)
     {
         if(contours[i].size()>bigContour1)
         {
@@ -57,7 +57,7 @@ void eyelash_detection(cv::Mat src, cv::Rect rectEye, cv::Mat &vis, cv::vector<c
     ptRight.y=0;
 
     cv::vector<cv::Point> eyeContour=contours[indbigContour1];
-    for(int i=0;i<eyeContour.size();i++)
+    for(unsigned int i=0;i<eyeContour.size();i++)
     {
         if(eyeContour.at(i).x<ptLeft.x)
             ptLeft=eyeContour[i];
